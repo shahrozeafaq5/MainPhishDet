@@ -1,6 +1,3 @@
-from datetime import datetime
+from pathlib import Path
 
-
-time = datetime.now()
-
-print(time)
+Path("my_folder").mkdir(exist_ok=True)
