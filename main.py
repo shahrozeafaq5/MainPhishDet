@@ -1,9 +1,12 @@
 import json
 import os
-
+from  urllib.parse import   urlparse
 from dotenv import load_dotenv
 from huggingface_hub import InferenceClient
 from tools import analyze_email, save_phishing_report
+import json
+
+from email_parser import parse_eml_file
 
 # 1. Load API token
 load_dotenv()
@@ -41,6 +44,8 @@ def clean_json_response(text: str) -> str:
 
     if cleaned.endswith("```"):
         cleaned = cleaned[:-3]
+    cleaned = cleaned.replace("**", "")
+    cleaned = cleaned.replace("*", "")
 
     return cleaned.strip()
 
@@ -85,40 +90,27 @@ Give:
 
 def main() -> None:
     print("\n=== Phishing Email Analyzer ===")
-    print("Paste the email below.")
-    print("Type END on a new line when finished.\n")
 
-    email_lines = []
+    file_path = input("Enter the path of the .eml file: ").strip()
 
-    while True:
-        line = input()
-
-        if line.strip().upper() == "END":
-            break
-
-        email_lines.append(line)
-
-    email_text = "\n".join(email_lines).strip()
-
-    if not email_text:
-        print("No email text was provided.")
+    if not file_path:
+        print("No file path provided.")
         return
 
     try:
-        answer = analyze_phishing_email(email_text)
+        email_data = parse_eml_file(file_path)
 
-        print("\n=== Analysis Result ===\n")
-        print(answer)
+        print("\n=== Parsed Email ===\n")
+        print(json.dumps(email_data, indent=2, ensure_ascii=False))
 
-        file_path = save_phishing_report(
-            email_text=email_text,
-            analysis=answer,
-        )
+    except FileNotFoundError as error:
+        print(f"\nError: {error}")
 
-        print(f"\nReport saved at: {file_path}")
+    except ValueError as error:
+        print(f"\nError: {error}")
 
     except Exception as error:
-        print(f"\nError: {error}")
+        print(f"\nUnexpected error: {error}")
 
 
 if __name__ == "__main__":

@@ -1,0 +1,186 @@
+Return-Path: <shahrozeafaq5@gmail.com>
+Received: from runnervm5mmn9.zrqr2oex231ezjigm0txkepa0a.cx.internal.cloudapp.net ([20.161.28.103])
+        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-96ed258bb75sm7822906241.1.2026.07.13.07.52.46
+        for <shahrozeafaq5@gmail.com>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 13 Jul 2026 07:52:47 -0700 (PDT)
+Message-ID: <6a54fbbf.ce05d057.113a3e.7a29@mx.google.com>
+Date: Mon, 13 Jul 2026 07:52:47 -0700 (PDT)
+From: shahrozeafaq5@gmail.com
+To: shahrozeafaq5@gmail.com
+Subject: =?utf-8?q?=F0=9F=9A=A8?= VulnBot AI Report: 5 Recent Vulnerabilities
+MIME-Version: 1.0
+Content-Type: multipart/alternative;
+ boundary="===============7483501988430061125=="
+
+--===============7483501988430061125==
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+
+Your email client does not support HTML.
+
+--===============7483501988430061125==
+Content-Type: text/html; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+
+
+    <html>
+    <body style=3D"font-family: Arial, sans-serif; color:#222;">
+        <h1>=F0=9F=9A=A8 VulnBot AI Security Report</h1>
+        <p>Found <b>18</b> recent vulnerabilities. Showing latest <b>5</b>.</=
+p>
+       =20
+        <div style=3D"border:1px solid #ddd; border-radius:10px; padding:16px=
+; margin-bottom:18px;">
+       =20
+            <h2>CVE-2026-15473</h2>
+            <p><b>Source:</b> NVD</p>
+            <p><b>Vendor/Product:</b> Unknown Unknown</p>
+            <p><b>Issue:</b> A vulnerability was identified in Eleveo Call Re=
+cording Software 9.7.0. This issue affects some unknown processing of th</p>
+            <p><b>Priority Score:</b> 48/100</p>
+            <p><b>CVSS:</b> 6.3</p>
+
+            <hr>
+
+            <p><b>What happened:</b> An improper authorization vulnerability =
+was discovered in Eleveo Call Recording Software version 9.7.0, specifically =
+within the /callrec/restoreCallAction.do endpoint, allowing remote attackers =
+to bypass authorization controls.</p>
+            <p><b>Who is affected:</b> Users of Eleveo Call Recording Softwar=
+e version 9.7.0.</p>
+            <p><b>Personal relevance:</b> Low</p>
+            <p><b>Reason:</b> The user's environment consists of modern web f=
+rameworks (FastAPI, React, Next.js), AI tools (Ollama), and general-purpose O=
+Ss, with no mention of Eleveo Call Recording Software in their tech stack.</p>
+            <p><b>Risk level:</b> Low</p>
+            <p><b>Should I care?</b> No</p>
+            <p><b>Recommended action:</b> No action required unless Eleveo Ca=
+ll Recording Software is deployed in an undisclosed part of the environment.<=
+/p>
+        </div>
+       =20
+        <div style=3D"border:1px solid #ddd; border-radius:10px; padding:16px=
+; margin-bottom:18px;">
+       =20
+            <h2>CVE-2026-15471</h2>
+            <p><b>Source:</b> NVD</p>
+            <p><b>Vendor/Product:</b> Unknown Unknown</p>
+            <p><b>Issue:</b> A vulnerability was found in Eleveo Call Recordi=
+ng Software 9.7.0. This affects an unknown part of the file /callrec/pci</p>
+            <p><b>Priority Score:</b> 46/100</p>
+            <p><b>CVSS:</b> 4.3</p>
+
+            <hr>
+
+            <p><b>What happened:</b> An improper authorization vulnerability =
+was discovered in Eleveo Call Recording Software version 9.7.0, specifically =
+within the /callrec/pci_dss_status.jsp file, allowing remote attackers to byp=
+ass authorization controls.</p>
+            <p><b>Who is affected:</b> Users of Eleveo Call Recording Softwar=
+e version 9.7.0.</p>
+            <p><b>Personal relevance:</b> Low</p>
+            <p><b>Reason:</b> The user's environment consists of modern web f=
+rameworks (FastAPI, React, Next.js), AI tools (Ollama), and general OS/cloud =
+tools, with no mention of Eleveo Call Recording Software in their stack.</p>
+            <p><b>Risk level:</b> Medium</p>
+            <p><b>Should I care?</b> No</p>
+            <p><b>Recommended action:</b> No action required unless Eleveo Ca=
+ll Recording Software is deployed in an undisclosed part of the environment.<=
+/p>
+        </div>
+       =20
+        <div style=3D"border:1px solid #ddd; border-radius:10px; padding:16px=
+; margin-bottom:18px;">
+       =20
+            <h2>CVE-2026-15474</h2>
+            <p><b>Source:</b> NVD</p>
+            <p><b>Vendor/Product:</b> Unknown Unknown</p>
+            <p><b>Issue:</b> A security flaw has been discovered in Eleveo Ca=
+ll Recording Software 9.7.0. Impacted is an unknown function of the file</p>
+            <p><b>Priority Score:</b> 46/100</p>
+            <p><b>CVSS:</b> 4.3</p>
+
+            <hr>
+
+            <p><b>What happened:</b> An improper authorization vulnerability =
+exists in Eleveo Call Recording Software 9.7.0, specifically within the /call=
+rec/audio.jsp file. A remote attacker can manipulate the 'callId' argument to=
+ bypass authorization checks.</p>
+            <p><b>Who is affected:</b> Users of Eleveo Call Recording Softwar=
+e version 9.7.0.</p>
+            <p><b>Personal relevance:</b> Low</p>
+            <p><b>Reason:</b> The user's environment does not list Eleveo Cal=
+l Recording Software among their tools, frameworks, or vendors.</p>
+            <p><b>Risk level:</b> Medium</p>
+            <p><b>Should I care?</b> No</p>
+            <p><b>Recommended action:</b> No action required unless Eleveo Ca=
+ll Recording Software is deployed in an undisclosed part of the environment.<=
+/p>
+        </div>
+       =20
+        <div style=3D"border:1px solid #ddd; border-radius:10px; padding:16px=
+; margin-bottom:18px;">
+       =20
+            <h2>CVE-2026-15470</h2>
+            <p><b>Source:</b> NVD</p>
+            <p><b>Vendor/Product:</b> Unknown Unknown</p>
+            <p><b>Issue:</b> A vulnerability has been found in Eleveo Call Re=
+cording Software 9.7.0. Affected by this issue is some unknown functiona</p>
+            <p><b>Priority Score:</b> 38/100</p>
+            <p><b>CVSS:</b> 4.3</p>
+
+            <hr>
+
+            <p><b>What happened:</b> An improper authorization vulnerability =
+was discovered in Eleveo Call Recording Software version 9.7.0, specifically =
+within the /callrec/group.jsp file, allowing remote attackers to bypass autho=
+rization controls.</p>
+            <p><b>Who is affected:</b> Users of Eleveo Call Recording Softwar=
+e version 9.7.0.</p>
+            <p><b>Personal relevance:</b> Low</p>
+            <p><b>Reason:</b> The user's environment consists of modern web f=
+rameworks (FastAPI, React, Next.js), AI tools (Ollama), and general OS/cloud =
+tools, with no mention of Eleveo Call Recording Software in their stack.</p>
+            <p><b>Risk level:</b> Low</p>
+            <p><b>Should I care?</b> No</p>
+            <p><b>Recommended action:</b> No action required unless Eleveo Ca=
+ll Recording Software is deployed in an undisclosed part of the environment.<=
+/p>
+        </div>
+       =20
+        <div style=3D"border:1px solid #ddd; border-radius:10px; padding:16px=
+; margin-bottom:18px;">
+       =20
+            <h2>CVE-2026-15472</h2>
+            <p><b>Source:</b> NVD</p>
+            <p><b>Vendor/Product:</b> Unknown Unknown</p>
+            <p><b>Issue:</b> A vulnerability was determined in Eleveo Call Re=
+cording Software 9.7.0. This vulnerability affects unknown code of the f</p>
+            <p><b>Priority Score:</b> 38/100</p>
+            <p><b>CVSS:</b> 4.3</p>
+
+            <hr>
+
+            <p><b>What happened:</b> A vulnerability in Eleveo Call Recording=
+ Software 9.7.0 allows remote attackers to perform improper authorization via=
+ the /callrec/composeEmailAction.do endpoint.</p>
+            <p><b>Who is affected:</b> Users of Eleveo Call Recording Softwar=
+e version 9.7.0.</p>
+            <p><b>Personal relevance:</b> Low</p>
+            <p><b>Reason:</b> The user's environment does not list Eleveo Cal=
+l Recording Software among their tools, frameworks, or vendors.</p>
+            <p><b>Risk level:</b> Low</p>
+            <p><b>Should I care?</b> No</p>
+            <p><b>Recommended action:</b> No action required unless Eleveo Ca=
+ll Recording Software is deployed in an undisclosed part of the environment.<=
+/p>
+        </div>
+       =20
+        <p style=3D"font-size:12px;color:#777;">Generated by VulnBot.</p>
+    </body>
+    </html>
+   =20
+
+--===============7483501988430061125==--

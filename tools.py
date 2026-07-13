@@ -1,6 +1,19 @@
 from datetime import datetime
 from pathlib import Path
+import re
+from urllib.parse import urlparse
+from datetime import datetime
+from pathlib import Path
 
+from reportlab.lib.pagesizes import A4
+from reportlab.lib.styles import getSampleStyleSheet
+from reportlab.lib.units import inch
+from reportlab.platypus import (
+    PageBreak,
+    Paragraph,
+    SimpleDocTemplate,
+    Spacer,
+)
 
 
 def analyze_email(email_text: str) -> dict:
@@ -78,23 +91,58 @@ if __name__ == "__main__":
 
 
 def save_phishing_report(email_text: str, analysis: str) -> str:
+    """Save the phishing analysis as a PDF report."""
+
     reports_folder = Path("phishing_reports")
     reports_folder.mkdir(exist_ok=True)
 
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    file_path = reports_folder / f"phishing_report_{timestamp}.md"
+    file_path = reports_folder / f"phishing_report_{timestamp}.pdf"
 
-    report = f"""# Phishing Email Analysis
+    document = SimpleDocTemplate(
+        str(file_path),
+        pagesize=A4,
+        rightMargin=0.7 * inch,
+        leftMargin=0.7 * inch,
+        topMargin=0.7 * inch,
+        bottomMargin=0.7 * inch,
+    )
 
-## Original Email
+    styles = getSampleStyleSheet()
+    content = []
 
-{email_text}
+    content.append(
+        Paragraph("Phishing Email Analysis Report", styles["Title"])
+    )
+    content.append(Spacer(1, 20))
 
-## Analysis
+    content.append(
+        Paragraph(f"<b>Generated:</b> {datetime.now():%Y-%m-%d %H:%M:%S}",
+                  styles["BodyText"])
+    )
+    content.append(Spacer(1, 20))
 
-{analysis}
-"""
+    content.append(Paragraph("Original Email", styles["Heading2"]))
+    content.append(Spacer(1, 8))
 
-    file_path.write_text(report, encoding="utf-8")
+    # Convert line breaks so they display correctly in the PDF
+    safe_email = email_text.replace("&", "&amp;")
+    safe_email = safe_email.replace("<", "&lt;").replace(">", "&gt;")
+    safe_email = safe_email.replace("\n", "<br/>")
+
+    content.append(Paragraph(safe_email, styles["BodyText"]))
+
+    content.append(PageBreak())
+
+    content.append(Paragraph("Analysis", styles["Heading2"]))
+    content.append(Spacer(1, 8))
+
+    safe_analysis = analysis.replace("&", "&amp;")
+    safe_analysis = safe_analysis.replace("<", "&lt;").replace(">", "&gt;")
+    safe_analysis = safe_analysis.replace("\n", "<br/>")
+
+    content.append(Paragraph(safe_analysis, styles["BodyText"]))
+
+    document.build(content)
 
     return str(file_path)
