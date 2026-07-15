@@ -1,0 +1,14 @@
+From: security@example.com
+To: user@example.com
+Subject: Verify your account immediately
+Content-Type: text/html; charset="UTF-8"
+
+<html>
+<body>
+    <p>Your account has been suspended.</p>
+
+    <a href="https://example.com">
+        Click here to verify your account
+    </a>
+</body>
+</html>

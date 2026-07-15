@@ -12,10 +12,232 @@ from reportlab.platypus import (
     SimpleDocTemplate,
     Spacer,
 )
+import ipaddress
+import socket
+from urllib.parse import urljoin, urlparse
+
+import httpx
+from bs4 import BeautifulSoup
 
 import re
 from urllib.parse import urlparse
 from email.utils import parseaddr
+
+
+
+
+
+def is_public_host(hostname: str) -> bool:
+    """
+    Prevent requests to localhost, private networks, link-local addresses,
+    and other non-public IP ranges.
+    """
+
+    if not hostname:
+        return False
+
+    try:
+        addresses = socket.getaddrinfo(
+            hostname,
+            None,
+            type=socket.SOCK_STREAM,
+        )
+    except socket.gaierror:
+        return False
+
+    for address in addresses:
+        ip_text = address[4][0]
+        ip = ipaddress.ip_address(ip_text)
+
+        if (
+            ip.is_private
+            or ip.is_loopback
+            or ip.is_link_local
+            or ip.is_multicast
+            or ip.is_reserved
+            or ip.is_unspecified
+        ):
+            return False
+
+    return True
+
+def analyze_webpage_html(html: str) -> dict:
+    if not html:
+        return {
+            "title": "",
+            "forms": 0,
+            "password_fields": 0,
+            "suspicious_page_indicators": [],
+        }
+
+    soup = BeautifulSoup(html, "html.parser")
+
+    title = ""
+
+    if soup.title and soup.title.string:
+        title = soup.title.string.strip()
+
+    forms = soup.find_all("form")
+
+    password_fields = soup.find_all(
+        "input",
+        {"type": "password"},
+    )
+
+    text = soup.get_text(" ", strip=True).lower()
+
+    indicators = []
+
+    suspicious_terms = [
+        "verify your account",
+        "confirm your identity",
+        "account suspended",
+        "session expired",
+        "sign in to continue",
+        "update payment",
+        "enter your password",
+        "security verification",
+    ]
+
+    for term in suspicious_terms:
+        if term in text:
+            indicators.append(
+                f"Page contains suspicious phrase: {term}"
+            )
+
+    if password_fields:
+        indicators.append(
+            f"Page contains {len(password_fields)} password field(s)."
+        )
+
+    if forms and password_fields:
+        indicators.append(
+            "Page contains a form requesting authentication details."
+        )
+
+    return {
+        "title": title,
+        "forms": len(forms),
+        "password_fields": len(password_fields),
+        "suspicious_page_indicators": indicators,
+    }
+def inspect_url(url: str, max_redirects: int = 5) -> dict:
+    """
+    Inspect a URL without executing JavaScript.
+
+    Returns:
+    - redirect chain
+    - final URL
+    - HTTP status
+    - page title
+    - phishing-related page indicators
+    """
+
+    parsed = urlparse(url)
+
+    if parsed.scheme not in {"http", "https"}:
+        return {
+            "error": "Only HTTP and HTTPS URLs are supported."
+        }
+
+    if not is_public_host(parsed.hostname or ""):
+        return {
+            "error": "URL points to a blocked or non-public address."
+        }
+
+    redirect_chain = []
+    current_url = url
+
+    headers = {
+        "User-Agent": (
+            "Mozilla/5.0 PhishingAnalyzer/1.0"
+        )
+    }
+
+    try:
+        with httpx.Client(
+            timeout=8.0,
+            follow_redirects=False,
+            headers=headers,
+        ) as client:
+
+            for _ in range(max_redirects + 1):
+                current_parsed = urlparse(current_url)
+
+                if not is_public_host(current_parsed.hostname or ""):
+                    return {
+                        "error": (
+                            "Redirect attempted to reach a blocked "
+                            "or non-public address."
+                        ),
+                        "redirect_chain": redirect_chain,
+                    }
+
+                response = client.get(current_url)
+
+                redirect_chain.append(
+                    {
+                        "url": current_url,
+                        "status_code": response.status_code,
+                    }
+                )
+
+                if response.status_code in {
+                    301,
+                    302,
+                    303,
+                    307,
+                    308,
+                }:
+                    location = response.headers.get("location")
+
+                    if not location:
+                        break
+
+                    current_url = urljoin(current_url, location)
+                    continue
+
+                content_type = response.headers.get(
+                    "content-type",
+                    "",
+                ).lower()
+
+                html = ""
+
+                if "text/html" in content_type:
+                    html = response.text[:500_000]
+
+                page_analysis = analyze_webpage_html(html)
+
+                return {
+                    "original_url": url,
+                    "final_url": str(response.url),
+                    "status_code": response.status_code,
+                    "redirect_chain": redirect_chain,
+                    "content_type": content_type,
+                    "page_analysis": page_analysis,
+                }
+
+        return {
+            "original_url": url,
+            "final_url": current_url,
+            "redirect_chain": redirect_chain,
+            "error": "Maximum redirect limit reached.",
+        }
+
+    except httpx.TimeoutException:
+        return {
+            "original_url": url,
+            "redirect_chain": redirect_chain,
+            "error": "Request timed out.",
+        }
+
+    except httpx.HTTPError as error:
+        return {
+            "original_url": url,
+            "redirect_chain": redirect_chain,
+            "error": str(error),
+        }  
 
 def analyze_html_links(html_body: str) -> dict:
     links = []
@@ -96,7 +318,11 @@ def analyze_email(email_data: dict, email_text: str) -> dict:
     email_lower = email_text.lower()
 
     urls = re.findall(r'https?://[^\s"\'<>]+', email_text)
+    url_inspection_results = []
 
+    for url in urls[:3]:
+        result = inspect_url(url)
+    url_inspection_results.append(result)
     suspicious_phrases = [
         phrase
         for phrase in suspicious_words
@@ -179,6 +405,18 @@ def analyze_email(email_data: dict, email_text: str) -> dict:
     score += len(attachment_issues) * 30
     score += len(urls) * 3
     score += len(misleading_links) * 35
+    for result in url_inspection_results:
+        page_analysis = result.get("page_analysis", {})
+
+        indicators = page_analysis.get(
+            "suspicious_page_indicators",
+            [],
+        )
+
+        score += len(indicators) * 15
+
+        if len(result.get("redirect_chain", [])) > 2:
+            score += 10
 
     score = min(score, 100)
 
@@ -206,6 +444,7 @@ def analyze_email(email_data: dict, email_text: str) -> dict:
             "reply_to_domain": reply_to_domain,
             "return_path_domain": return_path_domain,
         },
+        "url_inspection_results": url_inspection_results,
     }
 
 def analyze_attachments(email_data: dict) -> list[str]:
