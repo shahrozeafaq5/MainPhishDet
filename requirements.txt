@@ -2,3 +2,7 @@ huggingface-hub
 python-dotenv
 beautifulsoup4
 httpx
+fastapi
+uvicorn
+python-multipart
+jinja2

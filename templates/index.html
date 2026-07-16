@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>PhishScope</title>
+
+    <link
+        rel="stylesheet"
+        href="/static/style.css"
+    >
+</head>
+
+<body>
+    <div class="app-shell">
+
+        <aside class="sidebar">
+            <div>
+                <div class="brand">
+                    <div class="brand-mark">P</div>
+
+                    <div>
+                        <strong>PhishScope</strong>
+                        <span>Email intelligence</span>
+                    </div>
+                </div>
+
+                <nav class="navigation">
+                    <a class="nav-item active" href="#">
+                        <svg viewBox="0 0 24 24">
+                            <path
+                                d="M4 4h16v16H4zM4 9h16M9 9v11"
+                            />
+                        </svg>
+
+                        Analyzer
+                    </a>
+
+                    <a class="nav-item" href="#">
+                        <svg viewBox="0 0 24 24">
+                            <path
+                                d="M5 3h11l3 3v15H5zM8 11h8M8 15h8"
+                            />
+                        </svg>
+
+                        Reports
+                    </a>
+
+                    <a class="nav-item" href="#">
+                        <svg viewBox="0 0 24 24">
+                            <circle cx="12" cy="12" r="8" />
+                            <path d="M12 8v4l3 2" />
+                        </svg>
+
+                        Scan history
+                    </a>
+                </nav>
+            </div>
+
+            <!-- <div class="system-status">
+                <div class="status-dot"></div>
+
+                <div>
+                    <strong>Analysis engine</strong>
+                    <span>Online</span>
+                </div>
+            </div> -->
+        </aside>
+
+        <main class="workspace">
+            <header class="topbar">
+                <div>
+                    <p class="breadcrumb">Email security / Analyzer</p>
+                    <h1>Analyze an email</h1>
+                </div>
+
+                <!-- <div class="topbar-status">
+                    <span class="status-dot"></span>
+                    Engine ready
+                </div> -->
+            </header>
+
+            <section class="intro-panel">
+                <div>
+                    <h2>Inspect a suspicious email</h2>
+
+                    <p>
+                        Upload the original EML file to inspect headers,
+                        authentication, links, redirects, forms and attachments.
+                    </p>
+                </div>
+
+                <div class="privacy-note">
+                    <svg viewBox="0 0 24 24">
+                        <path
+                            d="M12 3l7 3v5c0 5-3 8-7 10-4-2-7-5-7-10V6z"
+                        />
+                    </svg>
+
+                    Uploaded files are removed after analysis.
+                </div>
+            </section>
+
+            <section class="analysis-layout">
+
+                <div class="upload-panel">
+                    <div class="panel-heading">
+                        <div>
+                            <span class="step-label">Input</span>
+                            <h3>Email file</h3>
+                        </div>
+
+                        <span class="file-format">EML</span>
+                    </div>
+
+                    <div
+                        id="dropZone"
+                        class="drop-zone"
+                        tabindex="0"
+                    >
+                        <div class="upload-symbol">
+                            <svg viewBox="0 0 24 24">
+                                <path
+                                    d="M12 16V4M7 9l5-5 5 5M5 14v5h14v-5"
+                                />
+                            </svg>
+                        </div>
+
+                        <h4>Drop an email file here</h4>
+
+                        <p>
+                            Drag and drop an .eml file, or
+                            <button
+                                id="browseButton"
+                                type="button"
+                                class="text-button"
+                            >
+                                browse your computer
+                            </button>
+                        </p>
+
+                        <span class="upload-limit">
+                            Maximum file size: 10 MB
+                        </span>
+
+                        <input
+                            id="fileInput"
+                            type="file"
+                            accept=".eml,message/rfc822"
+                            hidden
+                        >
+                    </div>
+
+                    <div
+                        id="selectedFile"
+                        class="selected-file hidden"
+                    >
+                        <div class="selected-file-icon">
+                            <svg viewBox="0 0 24 24">
+                                <path
+                                    d="M6 3h9l3 3v15H6zM15 3v4h4"
+                                />
+                            </svg>
+                        </div>
+
+                        <div class="selected-file-details">
+                            <strong id="selectedFileName"></strong>
+                            <span id="selectedFileSize"></span>
+                        </div>
+
+                        <button
+                            id="removeFileButton"
+                            class="remove-file"
+                            type="button"
+                            aria-label="Remove selected file"
+                        >
+                            ×
+                        </button>
+                    </div>
+
+                    <button
+                        id="analyzeButton"
+                        class="primary-button"
+                        disabled
+                    >
+                        <span id="buttonText">Run analysis</span>
+
+                        <span
+                            id="buttonSpinner"
+                            class="spinner hidden"
+                        ></span>
+                    </button>
+
+                    <p
+                        id="statusMessage"
+                        class="status-message"
+                    ></p>
+                </div>
+
+                <aside class="process-panel">
+                    <span class="step-label">Detection coverage</span>
+
+                    <h3>What gets inspected</h3>
+
+                    <div class="inspection-list">
+
+                        <div class="inspection-item">
+                            <span>01</span>
+
+                            <div>
+                                <strong>Sender authenticity</strong>
+                                <p>
+                                    From, Reply-To, Return-Path,
+                                    SPF, DKIM and DMARC.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="inspection-item">
+                            <span>02</span>
+
+                            <div>
+                                <strong>Links and redirects</strong>
+                                <p>
+                                    Destination domains, redirect chains,
+                                    reputation and misleading links.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="inspection-item">
+                            <span>03</span>
+
+                            <div>
+                                <strong>Page behavior</strong>
+                                <p>
+                                    Login forms, password fields and
+                                    cross-domain submissions.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="inspection-item">
+                            <span>04</span>
+
+                            <div>
+                                <strong>Attachments</strong>
+                                <p>
+                                    Risky extensions, archives and
+                                    suspicious filenames.
+                                </p>
+                            </div>
+                        </div>
+
+                    </div>
+                </aside>
+
+            </section>
+
+            <section
+                id="resultsSection"
+                class="results-section hidden"
+            >
+                <div class="results-title-row">
+                    <div>
+                        <span class="step-label">Analysis complete</span>
+                        <h2 id="resultSubject">Email analysis</h2>
+                    </div>
+
+                    <div
+                        id="riskBadge"
+                        class="risk-badge"
+                    >
+                        Unknown risk
+                    </div>
+                </div>
+
+                <div class="result-summary">
+
+                    <article class="risk-score-card">
+                        <div class="score-header">
+                            <div>
+                                <span>Risk score</span>
+                                <strong id="riskScore">0</strong>
+                            </div>
+
+                            <span class="score-total">/100</span>
+                        </div>
+
+                        <div class="score-track">
+                            <div
+                                id="scoreFill"
+                                class="score-fill"
+                            ></div>
+                        </div>
+
+                        <p id="riskDescription">
+                            No analysis available.
+                        </p>
+                    </article>
+
+                    <article class="email-meta-card">
+                        <span class="card-label">Message details</span>
+
+                        <div id="emailInformation"></div>
+                    </article>
+
+                </div>
+
+                <div class="evidence-grid">
+
+                    <article class="evidence-card">
+                        <div class="evidence-heading">
+                            <div class="evidence-icon warning">
+                                <svg viewBox="0 0 24 24">
+                                    <path
+                                        d="M12 3L2.5 20h19zM12 9v5M12 17h.01"
+                                    />
+                                </svg>
+                            </div>
+
+                            <div>
+                                <span>Evidence</span>
+                                <h3>Suspicious indicators</h3>
+                            </div>
+                        </div>
+
+                        <ul
+                            id="indicatorList"
+                            class="evidence-list"
+                        ></ul>
+                    </article>
+
+                    <article class="evidence-card">
+                        <div class="evidence-heading">
+                            <div class="evidence-icon information">
+                                <svg viewBox="0 0 24 24">
+                                    <circle cx="12" cy="12" r="9" />
+                                    <path d="M12 11v6M12 7h.01" />
+                                </svg>
+                            </div>
+
+                            <div>
+                                <span>Interpretation</span>
+                                <h3>Why it matters</h3>
+                            </div>
+                        </div>
+
+                        <ul
+                            id="reasonList"
+                            class="evidence-list"
+                        ></ul>
+                    </article>
+
+                    <article class="recommendation-card">
+                        <span class="card-label">
+                            Recommended response
+                        </span>
+
+                        <p id="recommendedAction"></p>
+                    </article>
+
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="/static/script.js"></script>
+</body>
+</html>
