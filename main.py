@@ -120,6 +120,10 @@ Rules:
   dangerous attachments, or urgent external actions.
 -Consider risky attachment types such as executables, scripts,
 archives, disk images, and shortcut files.
+- Treat VirusTotal detections as supporting evidence.
+- Clearly mention how many engines marked a URL as malicious or suspicious.
+- Do not treat a missing VirusTotal report as proof that a URL is safe.
+- Do not override strong local indicators merely because VirusTotal has no detection.
 """,
         },
         {

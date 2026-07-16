@@ -6,7 +6,10 @@ import ipaddress
 import re
 import socket
 from urllib.parse import urljoin, urlparse
-
+from url_reputation import (
+    calculate_reputation_score,
+    lookup_virustotal_url,
+)
 import httpx
 from bs4 import BeautifulSoup
 from reportlab.lib.pagesizes import A4
@@ -736,12 +739,21 @@ def analyze_email(
 
     attachment_issues = analyze_attachments(email_data)
 
-    url_inspection_results = []
 
-    for url in urls[:3]:
-        url_inspection_results.append(
-            inspect_url(url)
-        )
+url_reputation_results = []
+
+# Limit remote checks to prevent excessive requests
+for url in urls[:3]:
+    inspection_result = inspect_url(url)
+    reputation_result = lookup_virustotal_url(url)
+
+    url_inspection_results.append(
+        inspection_result
+    )
+
+    url_reputation_results.append(
+        reputation_result
+    )
 
     redirect_issue_count = 0
     page_indicator_count = 0
@@ -770,7 +782,41 @@ def analyze_email(
                 in form.get("issues", [])
             ):
                 external_password_form_count += 1
+    reputation_score = 0
+reputation_issues = []
 
+for result in url_reputation_results:
+    result_score = calculate_reputation_score(result)
+    reputation_score += result_score
+
+    if result.get("found"):
+        malicious_count = result.get(
+            "malicious",
+            0,
+        )
+
+        suspicious_count = result.get(
+            "suspicious",
+            0,
+        )
+
+        if malicious_count > 0:
+            reputation_issues.append(
+                (
+                    f"VirusTotal reports "
+                    f"{malicious_count} malicious detection(s) "
+                    f"for {result.get('url')}."
+                )
+            )
+
+        if suspicious_count > 0:
+            reputation_issues.append(
+                (
+                    f"VirusTotal reports "
+                    f"{suspicious_count} suspicious detection(s) "
+                    f"for {result.get('url')}."
+                )
+            )
     score = 0
     score += len(suspicious_phrases) * 8
     score += len(suspicious_urls) * 15
@@ -783,7 +829,7 @@ def analyze_email(
     score += redirect_issue_count * 15
     score += page_indicator_count * 8
     score += external_password_form_count * 30
-
+    score += min(reputation_score, 50)
     score = min(score, 100)
 
     if score >= 70:
@@ -794,27 +840,40 @@ def analyze_email(
         risk_level = "Low"
 
     return {
-        "risk_score": score,
-        "risk_level": risk_level,
-        "urls_found": urls,
-        "suspicious_urls": suspicious_urls,
-        "url_domain_issues": url_domain_issues,
-        "suspicious_phrases": suspicious_phrases,
-        "header_issues": header_issues,
-        "authentication_issues": authentication_issues,
-        "attachment_issues": attachment_issues,
-        "attachments": email_data.get("attachments", []),
-        "html_links": html_link_result["html_links"],
-        "misleading_links": html_link_result[
-            "misleading_links"
-        ],
-        "url_inspection_results": url_inspection_results,
-        "domains": {
-            "from_domain": from_domain,
-            "reply_to_domain": reply_to_domain,
-            "return_path_domain": return_path_domain,
-        },
-    }
+    "risk_score": score,
+    "risk_level": risk_level,
+    "urls_found": urls,
+    "suspicious_urls": suspicious_urls,
+    "url_domain_issues": url_domain_issues,
+    "suspicious_phrases": suspicious_phrases,
+    "header_issues": header_issues,
+    "authentication_issues": authentication_issues,
+    "attachment_issues": attachment_issues,
+    "attachments": email_data.get(
+        "attachments",
+        [],
+    ),
+    "html_links": html_link_result[
+        "html_links"
+    ],
+    "misleading_links": html_link_result[
+        "misleading_links"
+    ],
+    "url_inspection_results": (
+        url_inspection_results
+    ),
+    "url_reputation_results": (
+        url_reputation_results
+    ),
+    "reputation_issues": reputation_issues,
+    "domains": {
+        "from_domain": from_domain,
+        "reply_to_domain": reply_to_domain,
+        "return_path_domain": (
+            return_path_domain
+        ),
+    },
+}
 
 
 def save_phishing_report(
